@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>iAccount</title>
+	<link href="./mycss.css" rel="stylesheet" type="text/css" >
+	<!--还用requireJs去负责驱动模块的运行？-->
+	<script>
+		 (function(){
+			 // 先来搞定 我们的web在什么 平台上 跑着
+			 var UA = navigator.userAgent;
+			 
+			 var isiPad = UA.match(/(ipad)/i);  
+			 var isiPhone = UA.match(/(iphone\sos)\s(\d\_\d+)/i); // ["iPhone OS 8_0", "iPhone OS", "8_0"]
+			 var isAndroid = UA.match(/(android)\s(\d+\.\d)/i);  //如果是的话 ["Andriod"，"Andriod","4.2/*就是版本号啦*/"]
+			 // android = ua.match(/(Android);?[\s\/]+([\d.]+)?/)
+			 var iswindowPhone = UA.match(/(windows\s\phone)\s(\d\.\d)/i); //["Windows Phone 8.0", "Windows Phone", "8.0"]
+			 var isMobile = UA.match(/mobile/i)
+
+			 // isMobile  ipad上面也是isMobile，所以说，这个就实在是糟糕 isMobile || !isiPad  == (isMobile.length != 0 && isiPad == null) 
+			 // 这里先挖个坑 对于 不同的正则的写法 ，感觉在正则上面的技巧手法太弱爆
+			 if (isMobile.length != 0 && isiPad == null){ // 那就进入了适配  首先得匹配 mobile 其次 还不能 匹配出ipad
+			     reFreshFunc();
+			     // 飞分为两种适配方法 
+			     // 直接拉伸方法 ，假设采用
+			 }
+			 function reFreshFunc(){  // 利用rem来刷新的
+			     var dpr = window.devicePixelRatio;
+			     //console.log(dpr)
+			    // 这段是 确定了 viewport 的 meta标签 
+			     var metaList = document.getElementsByTagName("meta"),
+			         meta ;
+			     //console.log(metaList);    
+			     for(var i=0,len=metaList.length;i<len;i++){
+			         if (metaList[i].getAttribute("name") == "viewport"){   <!--  error -->
+			             meta =metaList[i];  
+			         }
+			         else{
+			             meta = document.createElement("meta");
+			             meta.setAttribute("name","viewport");
+			             document.getElementsByTagName("head")[0].appendChild(meta)
+			         }
+			     }
+			     // 
+			     var contentValue = "initial-scale="+1/dpr+",maximum-scale="+1/dpr+",user-scalable=no"
+			     meta.setAttribute("content",contentValue);
+			     // reset font-size;
+			     var baseWidth = window.screen.width;
+			     var newRem = ((baseWidth*dpr)/ 320)*16;
+			     document.getElementsByTagName("html")[0].style.fontSize = newRem +"px";
+
+			     // 以上 能跑 绝大多数的 主流 平台 如iphone，三星，HTC  
+			     // 对于 那些 比较 诡异 的 ，以及 某些 特殊情况的处理还不够 
+
+			 }	
+		})()
+	</script>
+</head>
+<body>  
+	<!-- 开始去写 页面的 布局和结构  -->
+<div id="aId">
+
+	<header id="headerMenu">
+
+	<div id="menu">
+		<i id="menuLeft" class="iconfont">&#xe60f;</i>
+		<h1>iAccount</h1>
+		<i id="menuAdd" class="iconfont">&#xe610;</i> <!-- -->
+	</div>
+	
+	<div id="nav" class="nav">
+		<ul>
+			<li id="accountModel">accountList</li>
+			<li id="accountStatist">accountStatist</li>
+			<li id="accountChart">accountChart</li>
+		</ul>
+	</div>
+	</header>
+
+	<div id="editAccountPart"> <!-- 这个是 用来 edit account的 地方  -->
+	</div>
+
+	<div id="cnmb">
+	</div> 
+	
+
+	<div id = "accountList"> <!-- 就是 全部 accountList 的 都在里面-->
+		<p>balbalablabala</p>
+		<ul id="accountListUl">
+		</ul>
+	</div>
+
+
+
+	<div id="charShowPart">
+		
+	</div>
+
+</div>
+
+
+
+
+
+
+
+<script type="text/template"  id="itemAccountTemplate">
+	<div class="content">
+
+    	<div class="testClass testClassClicked" title="x">
+			<i class="iconfont accountLi" title=<%= type %> > <%= typeCode %> </i>
+		</div>	
+		<p><%- num %></p> 
+		<p><%- date %></p>
+	</div>
+	
+	<div class="makeSome">
+		<div id="deleteAccount">
+			<i class="iconfont deleteAccount" >&#xe60d;</i>
+		</div>
+
+		<div id="editAccount">
+			<i class="iconfont editAccount" >&#xe610;</i>
+		</div>
+	</div>
+</script>
+
+<script type="text/template" id="editAccountTemplate">
+	
+	<div id="addHaederMenu">
+		<i id="menuLeftBack" class="iconfont">&#xe611;</i>
+		<h1>secondMenu</h1>
+		<p id="sureToEdit">确认</p> <!-- -->
+	</div>
+
+		<div id="shooseType">
+
+			<div class="get">
+				<div class=<%= type=="get" ? "testClassClicked" : "testClass"  %> title="get">
+					<i class="iconfont accountLi normal" title="get" >&#xe60b;</i>
+				</div>
+				<p>收入</p>
+			</div>
+
+			<div class="less">
+
+				<div id="trans">
+				<div class=<%= type=="trans"? "testClassClicked":"testClass"  %> title="trans"> 
+					<i class="iconfont accountLi normal" title="trans" >&#xe609;</i>
+				</div>		
+				<p>交通</p>
+				</div>
+
+				<div id="trip">
+				<div class=<%= type=="trip"? "testClassClicked":"testClass"  %> title="trip">
+					<i class="iconfont accountLi normal" title="trip">&#xe60a;</i>
+				</div>	
+				<p>旅行</p>
+				</div>
+
+				<div id="food">
+				<div class=<%= type=="food"? "testClassClicked":"testClass"  %> title="food">
+					<i class="iconfont accountLi normal" title="food">&#xe607;</i>
+				</div>	
+				<p>零食</p>	
+				</div>
+
+				<div id="life">
+				<div class=<%= type=="life"? "testClassClicked":"testClass"  %> title="life">
+					<i class="iconfont accountLi normal" title="life">&#xe601;</i>
+				</div>
+				<p>生活</p>
+				</div>
+
+				<div id="else">
+				<div class=<%= type=="else"? "testClassClicked":"testClass"  %> title="else" >
+					<i class="iconfont accountLi normal" title="else" >&#xe603;</i>
+				</div>
+				<p>其他</p>
+				</div>
+
+			</div>
+		</div>
+		<p>请输入数量</p>
+		<input id="addnumber" value=<%= num %> >
+</script>
+
+<script type="text/template" id="addAccountTemplate">
+	
+	<div id="addHaederMenu">
+		<i id="menuLeftBack" class="iconfont">&#xe611;</i>
+		<h1>secondMenu</h1>
+		<p id="sureToAdd">确认</p> <!-- -->
+	</div>
+
+	<div id="addAccountPart">
+	    <div id="shooseType">
+			<div class="get">
+			<div id="get">
+				<div class="testClass" title="get">
+					<i class="iconfont accountLi normal" title="get" >&#xe60b;</i>
+				</div>
+				<p>收入</p>
+			</div>	
+			</div>
+
+			<div class="less">
+
+				<div id="trans">
+				<div class="testClass" title="trans"> 
+					<i class="iconfont accountLi normal" title="trans" >&#xe609;</i>
+				</div>		
+				<p>交通</p>
+				</div>
+
+				<div id="trip">
+				<div class="testClass" title="trip">
+					<i class="iconfont accountLi normal" title="trip">&#xe60a;</i>
+				</div>	
+				<p>旅行</p>
+				</div>
+
+				<div id="food">
+				<div class="testClass" title="food">
+					<i class="iconfont accountLi normal" title="food">&#xe607;</i>
+				</div>	
+				<p>零食</p>	
+				</div>
+
+				<div id="life">
+				<div class="testClass" title="life">
+					<i class="iconfont accountLi normal" title="life">&#xe601;</i>
+				</div>
+				<p>生活</p>
+				</div>
+
+				<div id="else">
+				<div class="testClass" title="else" >
+					<i class="iconfont accountLi normal" title="else" >&#xe603;</i>
+				</div>
+				<p>其他</p>
+				</div>
+			</div>
+	    </div>
+
+
+	    <div id="addNumpart">
+	    	<p>请输入数量</p>
+	    	<input id="addnumber" value="">
+	    </div>
+	    
+	</div>
+</script>
+
+<script type="text/template" id="charShowTemplate">
+	
+	<p id="circlePic">饼状图表示</p>
+	<canvas id="canvasPic"></canvas>
+
+	<p id="cnmlgb"> ccccc</p>
+	<canvas id="canvasTwo" > </canvas>
+	
+</script>
+
+
+<script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="./scripts/underscore-min.js"></script>
+<script type="text/javascript" src="./scripts/backbone-min.js"></script>
+<script type="text/javascript" src="./scripts/backbone.localStorage-min.js"></script>
+
+
+<script type="text/javascript" src="./newJs.js"></script>
+
+
+
+</body>
+</html>

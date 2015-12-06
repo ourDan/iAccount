@@ -1,0 +1,248 @@
+*{
+	margin: 0;
+	padding:0;
+	box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+}
+
+
+$baseGreen : #8DD498;
+$baseOrange : #F39F61;
+$basePink : #F38787;
+$baseBlue : #6FB2DE;
+$baseBrown :#C6B29C;
+$baseRed : #D74C3D;
+
+@mixin borderBox{ /* 这么写一些常用的小的模块是否有用 */
+	border-sizing:border-box;
+	-webkit-border-sizing:border-box;
+
+}
+
+@mixin clearFloat{
+	content: "\200B";
+	display: block;
+	height: 0;
+	clear: both;
+}
+
+@mixin centerBothFlexBox{ /*水平竖直方向居中  的伸缩模型写法*/
+
+}
+@mixin centerXFlexBox{ /*水平方向居中 类似标题 */
+
+}
+@mixin centerYFlexBox{ /*竖直方向居中 */
+
+}
+
+@mixin headerH1{
+	position: absolute;
+	left: 50%;
+	font-size: 1rem;
+	float: left;
+	width:5rem;
+	margin-left: -3rem;
+	display: block;
+	width: 6rem;
+	text-align: center;
+	line-height: 3.75rem;
+}
+
+@mixin headerDiv{
+	position: relative;
+	text-align: center;
+	height: 3.75rem;
+	background-color: $baseGreen;
+}
+
+
+#headerMenu{
+	/*这里面竟然什么都没有*/
+	#menu{
+		@include headerDiv;
+
+		#menuLeft{
+			float:left;
+		}
+		.iconfont{
+			line-height: 3.75rem;
+		}
+
+		h1{
+			@include headerH1
+		}
+
+		#menuRight{
+			float:right;
+		}
+
+		@include clearFloat
+	}
+
+	#nav{
+		display: none;
+		li{
+			display: inline-block;
+			background-color: green;
+			font-size: 0.75rem;
+		}
+	}
+
+}
+
+
+#addHaederMenu{
+	@include headerDiv
+	@include clearFloat
+
+	#menuLeftBack{
+		float: left;
+		line-height: 3.75rem;
+	}
+	h1{
+		@include headerH1
+	}
+	#sureToAdd{
+		float: right;
+		font-size: 1.5rem;
+		color: white;
+		line-height: 3.75rem;
+	}
+}
+
+@mixin iconDiv{
+	margin: 0.25rem auto;
+
+	float:left;
+	width: 5rem;
+	text-align: center;
+		display: -ms-flex;
+	    display: -webkit-flex;
+	    display: flex;
+	    flex-driection:column;
+	    -webkit-flex-driection:column;
+	    flex-flow:column;
+	    justify-content:center;
+		display: -ms-flex;
+	    display: -webkit-flex;
+	    display: flex;
+	    -ms-flex-align: center;
+	    -webkit-align-items: center;
+	    -webkit-box-align: center;
+	    align-items: center;
+	    vertical-align: middle;
+	    -webkit-box-pack: start;
+		-moz-box-pack: start;
+		-webkit-justify-content: center;
+		-ms-flex-pack: start;
+		justify-content: center;	
+
+}
+
+
+#addAccountPart{
+	@include clearFloat
+
+	#shooseType{
+		height: 12rem;
+		@include clearFloat
+
+		.get{
+			width: 100%;
+			margin: 0.5rem auto;
+			@include clearFloat;
+
+			div{
+				@include iconDiv
+
+				[title=get]{
+					color:$baseGreen
+				}
+			}
+
+
+		}
+		.less{
+			width: 100%;
+			margin: 0.5rem auto;
+			@include clearFloat;
+
+			div{
+				@include iconDiv
+
+
+
+				[title=trans]{
+					color:$baseOrange
+				}
+				[title=trip]{
+					color: $baseBlue
+				}
+				[title=food]{
+					color:$baseRed
+				}
+				[title=life]{
+					color:$basePink
+				}
+				[title=else]{
+					color:$baseOrange
+				}
+			}
+
+		}
+
+		.testClass{  /*怎么说呢 其实这里并没有什么继承关系 这样写出来应该也是可以的吧*/
+				border:solid 0.2rem rgb(112,113,244);
+				width: 3.2rem;
+				height: 3.2rem;
+				border-radius: 1.6rem;
+				text-align: center;
+				
+
+				box-sizing:border-box;
+
+				    display: -ms-flex;
+			    display: -webkit-flex;
+			    display: flex;
+			    -ms-flex-align: center;
+			    -webkit-align-items: center;
+			    -webkit-box-align: center;
+			    align-items: center;
+			    vertical-align: middle;
+			    -webkit-box-pack: start;
+				-moz-box-pack: start;
+				-webkit-justify-content: center;
+				-ms-flex-pack: start;
+				justify-content: center;
+
+				left：50%；
+				margin-left: -1.6px
+		}
+	}
+
+	#addNumpart{
+		float: left;
+		margin-top: 0.75rem;
+
+		p{
+			font-size: 1.5rem;
+		}
+		input{
+			height: 2rem;
+			width: 15rem;
+			font-size: 1.5rem;
+		}
+
+	}
+
+
+}
+
+
+
+
+
+@import ;/*把原来搞不定的都搞进来 */
+
+
