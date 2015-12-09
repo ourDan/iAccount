@@ -12,32 +12,29 @@
 			this.date=""
 		},
 		toggle: function(xNum,xType,xTypeCode) {
-			console.log(xNum );
-			console.log(xType);
-			console.log(xTypeCode)
 		    this.save({num:xNum,type:xType,typeCode:xTypeCode});
-		    console.log(this.attributes)
+		    //console.log(this.attributes)
 		}
 	});
 
 
 	// 创建 管理这些个model的collection
 	var accountModleCollection = Backbone.Collection.extend({
-		model:accountModel , // 这个 collection 管理的都是accountModel
-		localStorage:new Backbone.LocalStorage("todos-backbone"), // 
-		events:{
-		},
+		model:accountModel ,
+		 // 这个 collection 管理的都是accountModel
 
-		initialize:function(){
-			this.charNumArr = [];
+		localStorage:new Backbone.LocalStorage("todos-backbone"), // 
+
+		events:{
+		
 		},
 
 		get: function() { 
 		  var e = window.event || arguments[0];
 		  var eTarget = e.target || e.srcElement;
-		  console.log(eTarget);
+		  console.log(this);
 
-		  if(eTarget.getAttribute("id") == "accountChart" ){
+		  if(eTarget && eTarget.getAttribute("id") == "accountChart" ){
 		  	this.getNumArr   = this.where({type:"get"});
 		  	this.transNumArr = this.where({type:"trans"});
 		  	this.tripNumArr  = this.where({type:"trip"});
@@ -84,12 +81,12 @@
 		  	}
 
 		  	ss(nnn);
-		  	console.log("cnm");
+		  	//console.log("cnm");
 		  	drawLinePic();
 
 		  	function drawLinePic(){
-		  	  	alert("i am drawing");
-
+		  	  	// alert("i am drawing");
+		  	  	
 		  	  	var ctx = document.getElementById("canvasTwo").getContext('2d');
 		  	  	var img = new Image();
 		  	  	img.onload = function(){
@@ -104,11 +101,20 @@
 		  	  	img.src = "./backdrop.png";	
 		  	}
 		  }
+		},
 
+		defualts:function(){
+			this.charNumArr = [];
+		},
+
+		initialize:function(){
+			
+			//console.log("am")
 
 
 		}
 
+		
 
 	});  
 	var accountList = new accountModleCollection;
@@ -120,6 +126,11 @@
 
 		events:{
 			"touchend #accountListUl":"moveToLeft"
+		},
+
+		initialize:function(){
+			//alert("cnm")
+			accountList.fetch();
 		},
 
 		moveToLeft:function(){
@@ -139,7 +150,7 @@
 			alert(accountList.getNum)
 		},
 	})
-	console.log(typeof appView)
+	//console.log(typeof appView)
 	var appControl = new appView;
 
 	// 要不然也用个 view来控制char图表显示
@@ -147,31 +158,29 @@
 		el:$("#charShowPart"),
 		tagName:"div",
 		template: _.template( $("#charShowTemplate").html() ),
-
 		render:function(){
 			this.$el.html( this.template() ) ;
 			return this;
-
-
-			
 		}
-
-
 	}) ;
-	console.log(typeof charView)
+	//console.log(typeof charView)
 	var charShowView = new charView;
 
 
 	// 创建 每个model  对应的view
 	var accountLiView = Backbone.View.extend({
 		tagName:"li",
-		template:_.template( $("#itemAccountTemplate").html() ), //
+		template: _.template( $("#itemAccountTemplate").html() ), //
 		events:{
 			"touchend #deleteAccount" : "clear", // 删除
 			"touchend #editAccount" : "edit"  // 点击进入编辑
 		}, 
 		initialize:function(){
+			this.listenTo(this.model,'change',function(){
+				alert("am")
+			})
 			this.listenTo(this.model,'change',this.reRender);
+
 		},
 		edit:function(){
 			//alert("i will edit ");
@@ -206,20 +215,19 @@
 			"touchend #accountModel" : "showList",
 			"touchend #accountChart" : "showChart" 
 		},
+
 		showList:function(){
 			alert("i will change")
 			$("#accountList").css("display","block");
 			$("#charShowPart").css("display","none");
 
 
-			},
+		},
+
 		showChart:function(){  // 先搞那个调用展示图表的东西 再调用绘图函数
-
 			//console.log($("#accountList").style);
-
 			$("#accountList").css("display","none");
 			$("#charShowPart").css("display","block");
-
 			$("aId").append(charShowView.render().el);
 			appControl.showChartWith();
 		},
@@ -229,10 +237,12 @@
 			this.disappear();
 			addAccountPart.prepareToAdd();
 		},
+
 		showSecond:function(){ // 显示二级菜单
 			//alert("cnmb")
 			this.$("#nav").css('display','block'); // not correct ,i will correct it soon 
 		},
+
 		disappear:function(){ // 一级菜单消失 
 			this.$el.css("display","none");
 			$("#accountList").css("display","none")
@@ -272,18 +282,18 @@
 		},
 
 		backToFirstMenu:function(){
-			alert("nm");
+			//alert("nm");
 			$("#headerMenu").css("display","block");
 			$("#accountList").css("display","block");
 			this.$el.html("");
 		},
 
 		addAccountView:function(account){
-			alert("i will add a ")
+			//alert("i will add a ")
 			var view = new accountLiView({model:account}); // 草草草 这里的格式搞混了，new 可以接受{model：myModel这样的参数} 
 			$("#accountListUl").append(view.render(account).el); // .el 是必不可少的，用来 将dom节点可以在浏览器里渲染出来
 			//$("#accountListUl").append("<h1>fxxk</h1>");
-			console.log($("#accountListUl"));
+			//console.log($("#accountListUl"));
 		},
 		makeSureNewAccountTypeCode:function(){  // 用来 确定到底选择了哪个icon，
 
@@ -336,8 +346,8 @@
 
 			var newAccount = accountList.create({num:$("#addnumber").val(),type:this.newAccountType,typeCode:this.newAccountTypeCode,date:this.date});  // 草 这个是不接受参数 {model:myModel}这样的格式，必须使用？
 
-			console.log({num:$("#addnumber").val(),type:this.newAccountType,typeCode:this.newAccountTypeCode,date:this.date})
-			console.log(newAccount);
+			//console.log({num:$("#addnumber").val(),type:this.newAccountType,typeCode:this.newAccountTypeCode,date:this.date})
+			//console.log(newAccount);
 			$("#addnumber").val(""); // error in this ,this.num.val("") 
 			(function(){ // 负责ui的变化
 				//$("#cnmb").css("display","none");
@@ -382,32 +392,25 @@
 		},
 
 		sureToEdit:function(){
-			alert("i will edit it");
+			//alert("i will edit it");
 			
 			$("#headerMenu").css("display","block");
 			$("#accountList").css("display","block");
 
 			this.$el.css("display","none");
-			//console.log( $("#addnumber") );
-			console.log($("#addnumber") );
-			console.log(this.typeCode);
-			console.log(this.type);
-
-			console.log({num:$("#addnumber").val(),type:this.type,typeCode:this.typeCode});
-			console.log(this.modelBox);
 			this.modelBox.toggle($("#addnumber").val(),this.type,this.typeCode);
 
 			this.$el.html("");
 		},
 		prepareToEdit:function(amodel){
-			alert("cnm")
+			//alert("cnm")
 			//$("#aId").append("<h1>cnm</h1>");
 			this.modelBox = amodel;
 			this.type = amodel.attributes.type;
 			this.typeCode = amodel.attributes.typeCode;
 
 
-			alert("i will show som");
+			//alert("i will show som");
 			$("#editAccountPart").css("display","block");
 
 			firstHeaderMenu.disappear();
@@ -418,8 +421,8 @@
 		},
 		changeOldAccountTypeCode:function(){  // 用来 确定到底选择了哪个icon，
 			//console.log("i am in firse step ,to choose a type")
-			console.log(this.typeCode);
-			console.log(this.type);
+			//console.log(this.typeCode);
+			//console.log(this.type);
 			
 			var event = document.event || arguments[0];
 			var eTarget = event.target || event.srcElemnt;
@@ -456,18 +459,15 @@
 
 			//console.log( "i am choosed "+this.newAccountTypeCode  +  "  " + this.newAccountType );
 			//console.log(this.newAccountType)
-			console.log(newAccountTypeCode);
-			console.log(newAccountType);
-
-
+			//console.log(newAccountTypeCode);
+			//console.log(newAccountType);
 			this.typeCode = newAccountTypeCode;
 			this.type = newAccountType;
-
-			console.log(this.TypeCode);
-			console.log(this.Type);
-
+			//console.log(this.TypeCode);
+			//console.log(this.Type);
 		},
 	})
 	var editAccountPart = new editAppView;
+
 
 })(jQuery)
