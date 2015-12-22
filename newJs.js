@@ -24,24 +24,22 @@
 		 // 这个 collection 管理的都是accountModel
 
 		localStorage:new Backbone.LocalStorage("todos-backbone"), // 
-
 		events:{
-		
 		},
 
-		get: function() { 
+		get: function() {  //这个就是制作图表的那个函数 
 		  var e = window.event || arguments[0];
 		  var eTarget = e.target || e.srcElement;
-		  console.log(this);
 
 		  if(eTarget && eTarget.getAttribute("id") == "accountChart" ){
+
 		  	this.getNumArr   = this.where({type:"get"});
 		  	this.transNumArr = this.where({type:"trans"});
 		  	this.tripNumArr  = this.where({type:"trip"});
 		  	this.foodNumArr  = this.where({type:"food"});
 		  	this.lifeNumArr  = this.where({type:"life"});
 		  	this.elseNumArr  = this.where({type:"else"});
-
+		  	//console.log(this.getNumArr);
 		  	var nnn = [];
 
 		  	this.getNum = this.getNumArr.length;
@@ -56,32 +54,38 @@
 		  	nnn.push(this.lifeNum);
 		  	this.elseNum = this.elseNumArr.length;
 		  	nnn.push(this.elseNum);
+		  	//console.log(nnn);
 
-		  	
 		  	function ss(arr) {
-
-		  		alert("nvnvnvn");
 
 		  		var draw = document.getElementById("canvasPic")
 		  	    var ctx = draw.getContext('2d');
-		  	   	var i=0,x;
-
+		  	   	var i=0,
+		  	   		x; //每次的增量 ，和那个数量成正比 
 		  	   	var color = ["red","green","black","yellow","blue","orange"];
 		  	   	var big = arr[0] + arr[1] + arr[2] + arr[3] + arr[4] + arr[5];
-		  	    
 		  	    for (var j=0,len = arr.length;j<len;j++){
-		  	      	x = arr[j] / big;
-		  	        ctx.lineWidth = arr[j]*10;
-		  	        ctx.strokeStyle = color[j];
-		  	        ctx.beginPath();
-		  	        ctx.arc(80,80,60,i*Math.PI,x*Math.PI);
-		  	        ctx.stroke();
+		  	      	
+		  	      	x = (arr[j] / big)*2;
+		  	      	console.log(x)
+		  	      	if(x!=0){
+		  	      		console.log("i draw a circle")
+		  	      		ctx.lineWidth = arr[j]*10;
+		  	      		ctx.strokeStyle = color[j];
+		  	      		console.log(color[j])
+		  	      		ctx.beginPath();
+		  	      		console.log(i*Math.PI+"  "+x*Math.PI)
+		  	      		ctx.arc(80,80,60,i*Math.PI,(i+x)*Math.PI);
+		  	      		ctx.stroke();
+		  	      	}
+
 		  	        i = i + x;
+		  	        console.log(i)
+
 		  	    };
 		  	}
 
 		  	ss(nnn);
-		  	//console.log("cnm");
 		  	drawLinePic();
 
 		  	function drawLinePic(){
@@ -110,12 +114,7 @@
 		initialize:function(){
 			
 			//console.log("am")
-
-
 		}
-
-		
-
 	});  
 	var accountList = new accountModleCollection;
 
@@ -147,7 +146,7 @@
 
 		showChartWith:function(){
 			accountList.get();
-			alert(accountList.getNum)
+			//alert(accountList.getNum)
 		},
 	})
 	//console.log(typeof appView)
@@ -176,7 +175,7 @@
 			"touchend #editAccount" : "edit"  // 点击进入编辑
 		}, 
 		initialize:function(){
-			this.listenTo(this.model,'change',function(){
+			this.listenTo(this.model,'onChange',function(){
 				alert("am")
 			})
 			this.listenTo(this.model,'change',this.reRender);
@@ -217,11 +216,9 @@
 		},
 
 		showList:function(){
-			alert("i will change")
+			//alert("i will change")
 			$("#accountList").css("display","block");
 			$("#charShowPart").css("display","none");
-
-
 		},
 
 		showChart:function(){  // 先搞那个调用展示图表的东西 再调用绘图函数
@@ -260,7 +257,7 @@
 			this.listenTo(accountList,"add",this.addAccountView); // 一旦collectioon 多了一个model，就调用addAccountView
 
 			this.number = $("#addnumber");
-			console.log(this.number)
+			//console.log(this.number)
 			this.newAccountTypeCode = "";
 			this.newAccountType = "";
 			this.date = (function(){
@@ -343,18 +340,27 @@
 		},
 
 		sureToAddFunc:function(e){  // 点击了
+			// 最好先验证一下表单吧
+			if(!this.newAccountTypeCode){
+				alert("请选择账目类型")
+			}else if( !$("#addnumber").val()){
+				alert("请输入账目数量")
+			}
 
-			var newAccount = accountList.create({num:$("#addnumber").val(),type:this.newAccountType,typeCode:this.newAccountTypeCode,date:this.date});  // 草 这个是不接受参数 {model:myModel}这样的格式，必须使用？
+			else{  // 在那个 验证的情况下
+				var newAccount = accountList.create({num:$("#addnumber").val(),type:this.newAccountType,typeCode:this.newAccountTypeCode,date:this.date});  // 草 这个是不接受参数 {model:myModel}这样的格式，必须使用？
 
-			//console.log({num:$("#addnumber").val(),type:this.newAccountType,typeCode:this.newAccountTypeCode,date:this.date})
-			//console.log(newAccount);
-			$("#addnumber").val(""); // error in this ,this.num.val("") 
-			(function(){ // 负责ui的变化
-				//$("#cnmb").css("display","none");
-				$("#headerMenu").css("display","block");
-				$("#accountList").css("display","block");
-				$("#cnmb").html("");
-			})()
+				//console.log({num:$("#addnumber").val(),type:this.newAccountType,typeCode:this.newAccountTypeCode,date:this.date})
+				//console.log(newAccount);
+				$("#addnumber").val(""); // error in this ,this.num.val("") 
+				(function(){ // 负责ui的变化
+					//$("#cnmb").css("display","none");
+					$("#headerMenu").css("display","block");
+					$("#accountList").css("display","block");
+					$("#cnmb").html("");
+				})()
+			}
+
 		},
 
 		prepareToAdd:function(){
@@ -403,27 +409,19 @@
 			this.$el.html("");
 		},
 		prepareToEdit:function(amodel){
-			//alert("cnm")
-			//$("#aId").append("<h1>cnm</h1>");
 			this.modelBox = amodel;
 			this.type = amodel.attributes.type;
 			this.typeCode = amodel.attributes.typeCode;
 
-
-			//alert("i will show som");
 			$("#editAccountPart").css("display","block");
 
 			firstHeaderMenu.disappear();
 			this.$el.append( this.editTemplate({num:amodel.attributes.num,type:amodel.attributes.type} ));
 			this.delegateEvents();
 			return this;
-			
 		},
 		changeOldAccountTypeCode:function(){  // 用来 确定到底选择了哪个icon，
-			//console.log("i am in firse step ,to choose a type")
-			//console.log(this.typeCode);
-			//console.log(this.type);
-			
+
 			var event = document.event || arguments[0];
 			var eTarget = event.target || event.srcElemnt;
 			if (eTarget.nodeName = "i"){   // 一般 情况下 都会有 点击 触发 ，触发啥呢，就是
@@ -456,15 +454,8 @@
 				}
 				eTarget.parentNode.setAttribute("class","testClassClicked");
 			};
-
-			//console.log( "i am choosed "+this.newAccountTypeCode  +  "  " + this.newAccountType );
-			//console.log(this.newAccountType)
-			//console.log(newAccountTypeCode);
-			//console.log(newAccountType);
 			this.typeCode = newAccountTypeCode;
 			this.type = newAccountType;
-			//console.log(this.TypeCode);
-			//console.log(this.Type);
 		},
 	})
 	var editAccountPart = new editAppView;
